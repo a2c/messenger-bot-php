@@ -1,0 +1,4 @@
+composer.lock
+/web/dev.log
+/web/access.log
+/vendor/*

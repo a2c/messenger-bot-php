@@ -1,0 +1,16 @@
+{
+    "require": {
+        "silex/silex": "~1.3",
+        "symfony/browser-kit": "*",
+        "doctrine/dbal": "~2.2",
+	"monolog/monolog" : "*"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Message\\": "src/Message/"
+        }
+    }
+
+}
