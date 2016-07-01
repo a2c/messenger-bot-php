@@ -234,7 +234,7 @@ class DefaultController implements ControllerProviderInterface
      *
      */
     public function sendImageMessage($recipientId) {
-      $messageData = array(
+        $messageData = array(
             'recipient' => array(
                 'id' => $recipientId
             ),
