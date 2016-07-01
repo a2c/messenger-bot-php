@@ -1,0 +1,10 @@
+
+{
+	"parameters":
+	{
+	    "validation_token": "this_is_a_test",
+	    "app_id": "829530520514640",
+	    "app_secret": "02cce8bde2ee4a5c03badb7023b4d617",
+	    "page_access_token": "EAALydCABcFABAIrNjRBhseV4DcFyZCefZBM3f5svELCkNm1U4R70MZADllJ0nwMRstmhe2EdbSFVZAOAFHyXt3eY3HuN87Q8ANwtHlTBavByKajZCYTW0YQIIiXlpUtDZBLsgSaS4HmOfxUZAVGHe3iqa9JPa4MFDQxWlRj0cgojwZDZD"
+	}
+}

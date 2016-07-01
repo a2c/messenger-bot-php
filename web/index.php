@@ -19,4 +19,5 @@ $app->error(function (\Exception $e, $code) use ($app) {
 	$message = str_replace('"', '', $e->getMessage());
 	return $app->json($message, $code);
 });
+
 $app->run();

@@ -9,15 +9,11 @@ use Datetime;
 
 class DefaultController implements ControllerProviderInterface
 {
-    private $VALIDATION_TOKEN = 'this_is_a_test';
-    private $APP_ID = '829530520514640';
-    private $APP_SECRET = '02cce8bde2ee4a5c03badb7023b4d617';
-    private $PAGE_ACCESS_TOKEN = 'EAALydCABcFABAIrNjRBhseV4DcFyZCefZBM3f5svELCkNm1U4R70MZADllJ0nwMRstmhe2EdbSFVZAOAFHyXt3eY3HuN87Q8ANwtHlTBavByKajZCYTW0YQIIiXlpUtDZBLsgSaS4HmOfxUZAVGHe3iqa9JPa4MFDQxWlRj0cgojwZDZD';
     private $app;
 
     public function __construct($app)
     {
-        if (!($this->APP_SECRET && $this->VALIDATION_TOKEN && $this->PAGE_ACCESS_TOKEN)) {
+        if (!($app['config']['app_secret'] && $app['config']['validation_token'] && $app['config']['page_access_token'])) {
           var_dump("Missing config values");
           exit();
         }
@@ -28,7 +24,7 @@ class DefaultController implements ControllerProviderInterface
     public function webhookGetAction(Request $request)
     {   
         if ($request->query->get('hub_mode') === 'subscribe' &&
-            $request->query->get('hub_verify_token') === $this->VALIDATION_TOKEN) {
+            $request->query->get('hub_verify_token') === $this->app['config']['validation_token']) {
             return $request->query->get('hub_challenge');
         } else {
             return $this->app->json("Failed validation. Make sure the validation tokens match.", 403);
@@ -161,9 +157,6 @@ class DefaultController implements ControllerProviderInterface
         $messageText = $message['text'];
         $messageAttachments = $message['attachments'];
         
-        $this->log(json_encode($messageText));
-
-
         if ($messageText) {
             switch ($messageText) {
               case 'image':
@@ -483,17 +476,11 @@ class DefaultController implements ControllerProviderInterface
      */
     public function callSenderInfoAPI($recipientId) {
 
-        $headers = array(
-            'Content-Type: application/json'
+        $token = $this->app['config']['page_access_token'];
+        $response = $this->curl(
+            'https://graph.facebook.com/v2.6/' . $recipientId . '?access_token=' . $token,
+            $messageData
         );
-        $process = curl_init('https://graph.facebook.com/v2.6/' . $recipientId .'?access_token=' . $this->PAGE_ACCESS_TOKEN);
-        curl_setopt($process, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($process, CURLOPT_HEADER, false);
-        curl_setopt($process, CURLOPT_TIMEOUT, 30);
-
-        curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
-        $return = curl_exec($process);
-        curl_close($process);
 
         return json_decode($return, true);
     }
@@ -505,11 +492,22 @@ class DefaultController implements ControllerProviderInterface
      */
     public function callSendAPI($messageData) {
 
+        $token = $this->app['config']['page_access_token'];
+        $response = $this->curl(
+            'https://graph.facebook.com/v2.6/me/messages?access_token=' . $token,
+             $messageData
+        );
+        
+        return $this->app->json('$response');
+    }
+
+    private function curl($url, $messageData) {
+
         $headers = array(
             'Content-Type: application/json'
         );
 
-        $process = curl_init('https://graph.facebook.com/v2.6/me/messages?access_token=' . $this->PAGE_ACCESS_TOKEN);
+        $process = curl_init($url);
         curl_setopt($process, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($process, CURLOPT_HEADER, false);
         curl_setopt($process, CURLOPT_TIMEOUT, 30);
@@ -520,11 +518,8 @@ class DefaultController implements ControllerProviderInterface
         curl_setopt($process, CURLOPT_RETURNTRANSFER, true);
         $return = curl_exec($process);
 
-        $this->log(json_encode($messageData));
-        $this->log(json_encode($return));
-        
         curl_close($process);
 
-        return $this->app->json($return);
+        return $return;
     }
 }
